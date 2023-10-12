@@ -1,10 +1,10 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import Message, CallbackQuery
 import httpx
 
 from BinanceAPI import url
-from keyboard.keyboard import main_kb, docs
+from keyboard.keyboard import main_kb, docs, about_contacts
 from utils.utils import converter_currency
 
 router = Router()
@@ -21,19 +21,24 @@ async def start_handler(message: Message) -> Message:
 
 
 @router.callback_query()
-async def callback_inline(call: CallbackQuery):
-    with open("msg.txt", encoding='utf-8') as f:
+async def callback_inline(call: CallbackQuery) -> CallbackQuery:
+    with open("messages/msg.txt", encoding='utf-8') as f:
         msg = f.read()
         await call.answer(text=msg, show_alert=True)
+
 
 
 @router.message(Command(commands=["assets"]))
 async def crypto_assets_handler(message: Message, command: CommandObject) -> Message:
     data = httpx.get(url=f"{url}/ticker/price?symbol={command.args.upper().strip()}")
-    json = data.json()
-    exchange_data = converter_currency(amount=float(json['price']), from_cur='USD', to_cur='EUR')
-    await message.answer(
-        f"{json['symbol']}: {float(json['price'])}$ | ~{exchange_data['new_amount']}{exchange_data['new_currency']}")
+    if data.status_code == 200:
+        json = data.json()
+        exchange_data = converter_currency(amount=float(json['price']), from_cur='USD', to_cur='EUR')
+        await message.answer(
+            f"{json['symbol']}: {float(json['price'])}{exchange_data['old_currency']} | ~{exchange_data['new_amount']}{exchange_data['new_currency']}")
+    else:
+        await message.reply("<strong>Следуйте правилам, согласно документации!</strong>", parse_mode="HTML",
+                            reply_markup=docs)
 
 
 @router.message(Command(commands=["convert"]))
@@ -43,4 +48,10 @@ async def convert_currency_online_handler(message: Message, command: CommandObje
     await message.answer(
         f"{int(conv_data['old_amount'])} {conv_data['old_currency']} = ~{conv_data['new_amount']} {conv_data['new_currency']}")
 
+
+@router.message(F.text == "About developer")
+async def about_handler(message: Message) -> Message:
+    with open("messages/about.txt", encoding='utf-8') as f:
+        text = f.read()
+        await message.answer(text, parse_mode="HTML", reply_markup=about_contacts)
 
