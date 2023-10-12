@@ -1,12 +1,17 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
+from aiogram.types import Message, CallbackQuery
 
 import handlers.handlers
 from config import TOKEN
+from keyboard.keyboard import main_kb
 
 bot = Bot(TOKEN)
 dp = Dispatcher()
+
+
 
 
 async def main():
