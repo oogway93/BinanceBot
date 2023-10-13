@@ -1,6 +1,6 @@
 # BinanceBot
 
-### *__BinanceBot__* is a restaurant with lots of different and delecious food.
+### *__BinanceBot__* is a telegram bot, which can convert currency, get information from Binance.com and receive it bunch of data  to user in tg💬💣
 
 1. At first, you need to make a local environment and activate it.
    ```python
@@ -14,3 +14,6 @@
    TOKEN='Get if from the BotFather'
    API_NINJA_KEY='Get it from this site: https://api-ninjas.com/ ' (Free 50000 api)
 4. Start the bot by a command in main.py
+
+> Please, rate this project🙏🎖️💥
+> I am going to continue developing the project.
