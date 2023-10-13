@@ -3,8 +3,9 @@ from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import Message, CallbackQuery
 import httpx
 
-from BinanceAPI import url
-from keyboard.keyboard import main_kb, docs, about_contacts
+import keyboard.ReplyKeyboards
+from BinanceAPI_URLS import url
+import keyboard
 from utils.utils import converter_currency
 
 router = Router()
@@ -14,9 +15,9 @@ router = Router()
 async def start_handler(message: Message) -> Message:
     await message.delete()
     await message.answer(
-        f"Hello, I'm a binance bot! I can exchange currency, get shares, currency rate online and so on...",
-        reply_markup=main_kb)
-    await message.answer('Look at below', reply_markup=docs)
+        "Hello, I'm a binance bot! I can exchange currency, get shares, currency rate online and so on...",
+        reply_markup=keyboard.ReplyKeyboards.main_kb)
+    await message.answer('Look at below', reply_markup=keyboard.InlineKeyboards.docs)
     await message.answer_sticker("CAACAgQAAxkBAAEKgTllJumjWJ7_Xabx60lD-r87mVA7_QACUAEAAqghIQaxvfG1zemEojAE")
 
 
@@ -25,7 +26,6 @@ async def callback_inline(call: CallbackQuery) -> CallbackQuery:
     with open("messages/msg.txt", encoding='utf-8') as f:
         msg = f.read()
         await call.answer(text=msg, show_alert=True)
-
 
 
 @router.message(Command(commands=["assets"]))
@@ -38,7 +38,7 @@ async def crypto_assets_handler(message: Message, command: CommandObject) -> Mes
             f"{json['symbol']}: {float(json['price'])}{exchange_data['old_currency']} | ~{exchange_data['new_amount']}{exchange_data['new_currency']}")
     else:
         await message.reply("<strong>Следуйте правилам, согласно документации!</strong>", parse_mode="HTML",
-                            reply_markup=docs)
+                            reply_markup=keyboard.InlineKeyboards.docs)
 
 
 @router.message(Command(commands=["convert"]))
@@ -53,5 +53,4 @@ async def convert_currency_online_handler(message: Message, command: CommandObje
 async def about_handler(message: Message) -> Message:
     with open("messages/about.txt", encoding='utf-8') as f:
         text = f.read()
-        await message.answer(text, parse_mode="HTML", reply_markup=about_contacts)
-
+        await message.answer(text, parse_mode="HTML", reply_markup=keyboard.InlineKeyboards.about_contacts)
